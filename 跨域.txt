@@ -1,0 +1,35 @@
+﻿跨域问题：
+    1.在config/index.js 里加入
+        proxyTable: {
+        // proxy all requests starting with /api to jsonplaceholder
+        '/api/**': {
+            target: 'http://jspang.com',
+            changeOrigin: true, //这个是跨域地址变化
+            pathRewrite: {
+            '^/api': '/' //这个是重写地址
+            }
+        }
+        }
+    2.在config文件夹下添加 api.config.js文件，并添加下面代码
+        const isPro = Object.is(process.env.NODE_ENV,'production')
+        module.exports = {
+            baseUrl: isPro ?'http://jspang.com/':'/'
+        }
+    3.在 Pos.vue 中的地址需要修改为下面这样
+        axios.get('/api/DemoApi/oftenGoods.php')
+        .then(response=>{
+        // console.log(response);
+        this.oftenGoods = response.data;
+        })
+        .catch(error=>{
+        console.log(error);
+        alert('网络错误，不能访问');
+        })
+    4.在入口文件 main.js 中
+        import axios from 'axios'
+        import apiConfig from '../config/api.config'
+        axios.defaults.baseURL = apiConfig.baseURL
+
+
+
+
