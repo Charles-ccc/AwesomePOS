@@ -143,9 +143,9 @@ export default {
   methods:{
     addOrderList(goods){
       //商品是否已经存在于订单列表中
-      let isHave=false;
-      for(let i=0;i<this.tableData.length;i++){
-        if(this.tableData[i]=goods.goodsId){
+      var isHave=false;
+      for(var i=0;i<this.tableData.length;i++){
+        if(this.tableData[i].goodsId=goods.goodsId){
           isHave=true;
         }
       }
@@ -153,20 +153,20 @@ export default {
       //根据判断的值编写业务逻辑
       if(isHave){
         //如果存在，就改变商品的数量
-        let arr = this.tableData.filter(a=>a.goodsId == goods.goodsId);
-       /*  function (a){
-          return a.goodsId == goods.goodsId
-        } */
+        console.log(this.tableData)
+        var arr = this.tableData.filter(o =>o.goodsId == goods.goodsId);
         arr[0].count++;
       }else{
-        let newGoods={
+        var newGoods={
           goodsId:goods.goodsId,
           goodsName:goods.goodsName,
           price:goods.price,
           count:1
         }
         this.tableData.push(newGoods);
+        console.log(this.tableData)
       }
+      console.log(this.tableData)
     }
   }
 }
