@@ -10,11 +10,16 @@
               <el-table-column prop="price" label="金额" width="80"></el-table-column>
               <el-table-column label="操作" width="100" fixed="right">
                 <template slot-scope="scope">
-                  <el-button type="text" size="small">增加</el-button>
-                  <el-button type="text" size="small">删除</el-button>
+                  <el-button type="text" size="small" @click="addOrderList(scope.row)">增加</el-button>
+                  <!-- @click="addOrderList(goods)" 因为这个模版里没有goods，所以用模版作用域来用scope.row-->
+                  <el-button type="text" size="small" >删除</el-button>
                 </template>
               </el-table-column>
             </el-table>
+            <div class="totalDiv">
+              <span>数量：<i>{{totalCount}}</i></span>
+              <span>金额：<i>{{totalMoney}}</i>元</span>
+            </div>
             <div class="divBtn">
               <el-button type="warning">挂单</el-button>
               <el-button type="danger">删除</el-button>
@@ -47,7 +52,7 @@
             <el-tab-pane label="汉堡">
              <div>
                <ul class="cookList">
-                 <li v-for="(goods,index) in type0Goods" :key="index">
+                 <li v-for="(goods,index) in type0Goods" :key="index" @click="addOrderList(goods)">
                    <span class="foodImg">
                      <img :src="goods.goodsImg" width="100%" alt="" />
                    </span>
@@ -59,7 +64,7 @@
             </el-tab-pane>
             <el-tab-pane label="小食">
               <ul class="cookList">
-                 <li v-for="(goods,index) in type1Goods" :key="index">
+                 <li v-for="(goods,index) in type1Goods" :key="index" @click="addOrderList(goods)">
                    <span class="foodImg">
                      <img :src="goods.goodsImg" width="100%" alt="" />
                    </span>
@@ -70,7 +75,7 @@
             </el-tab-pane>
             <el-tab-pane label="饮料">
               <ul class="cookList">
-                 <li v-for="(goods,index) in type2Goods" :key="index">
+                 <li v-for="(goods,index) in type2Goods" :key="index" @click="addOrderList(goods)">
                    <span class="foodImg">
                      <img :src="goods.goodsImg" width="100%" alt="" />
                    </span>
@@ -81,7 +86,7 @@
             </el-tab-pane>
             <el-tab-pane label="套餐">
             <ul class="cookList">
-                 <li v-for="(goods,index) in type3Goods" :key="index">
+                 <li v-for="(goods,index) in type3Goods" :key="index" @click="addOrderList(goods)">
                    <span class="foodImg">
                      <img :src="goods.goodsImg" width="100%" alt="" />
                    </span>
@@ -109,7 +114,9 @@ export default {
       type0Goods:[],
       type1Goods:[],
       type2Goods:[],
-      type3Goods:[]
+      type3Goods:[],
+      totalMoney:0,
+      totalCount:0
     }
   },
   created:function(){
@@ -142,32 +149,44 @@ export default {
   },
   methods:{
     addOrderList(goods){
-      //商品是否已经存在于订单列表中
+      //初始化总金额和数量
+      this.totalMoney=0;
+      this.totalCount=0;
+
+      //判断商品是否已经存在于订单列表tableData中，首先会初始化为false
       var isHave=false;
       for(var i=0;i<this.tableData.length;i++){
-        if(this.tableData[i].goodsId=goods.goodsId){
+        if(this.tableData[i].goodsId == goods.goodsId){ //如果tableData中的id与点击的商品id相同，就进入true
           isHave=true;
         }
       }
 
-
       //根据判断的值编写业务逻辑
       if(isHave){
         //如果存在，就改变商品的数量
-        console.log(this.tableData)
-        var arr = this.tableData.filter(o =>o.goodsId == goods.goodsId);
-        arr[0].count++;
+        let tb =[]      //当tableData中存在商品是，新建一个数组
+        for( let i=0;i<this.tableData.length;i++){  //遍历这个tableData
+          tb.push(this.tableData[i].goodsId);   //往数组里面添加点击的goodsId
+        }
+        let indexId = tb.indexOf(goods.goodsId)
+        //indexOf() 方法可返回某个指定的字符串值在字符串中首次出现的位置。
+        //获取当前所点击的goodsId，然后在数组中找到这条数据
+        this.tableData[indexId].count++
+        //将获取的这个数据的id的count加一
       }else{
-        var newGoods={
+        let newGoods={
           goodsId:goods.goodsId,
           goodsName:goods.goodsName,
           price:goods.price,
           count:1
         }
         this.tableData.push(newGoods);
-        console.log(this.tableData)
-      }
-      console.log(this.tableData)
+      };
+
+      this.tableData.forEach((element)=>{
+        this.totalCount+=element.count;
+        this.totalMoney=this.totalMoney+(element.price*element.count);
+      });
     }
   }
 }
@@ -210,7 +229,7 @@ export default {
   }
   .cookList li{
     cursor: pointer;
-    width: 23%;
+    width: 16%;
     border:1px solid #e5e9f2;
     height: auto;
     overflow: hidden;
@@ -235,5 +254,17 @@ export default {
     font-size:16px;
     padding-left:10px;
     padding-top: 10px;
+  }
+  .totalDiv{
+    background-color: #fff;
+    padding: 10px;
+    border-bottom: 1px solid #e5e9f2;
+  }
+  .totalDiv span{
+    margin: 0 10px
+  }
+  .totalDiv i{
+    margin: 0 6px;
+    color: #58b7ff
   }
 </style>
