@@ -1,4 +1,5 @@
 # awesome-pos
+> Charles-ccc
 
 > A Vue.js project
 

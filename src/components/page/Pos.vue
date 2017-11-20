@@ -12,7 +12,7 @@
                 <template slot-scope="scope">
                   <el-button type="text" size="small" @click="addOrderList(scope.row)">增加</el-button>
                   <!-- @click="addOrderList(goods)" 因为这个模版里没有goods，所以用模版作用域来用scope.row-->
-                  <el-button type="text" size="small" >删除</el-button>
+                  <el-button type="text" size="small" @click="delsingleGoods(scope.row)">删除</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -22,8 +22,8 @@
             </div>
             <div class="divBtn">
               <el-button type="warning">挂单</el-button>
-              <el-button type="danger">删除</el-button>
-              <el-button type="success">结账</el-button>
+              <el-button type="danger" @click="delallGoods">删除</el-button>
+              <el-button type="success" @click="checkOut()">结账</el-button>
             </div>
           </el-tab-pane>
           <el-tab-pane label="挂单">
@@ -182,11 +182,48 @@ export default {
         }
         this.tableData.push(newGoods);
       };
-
-      this.tableData.forEach((element)=>{
+      this.getAllGoods();
+      //汇总金额和数量
+        // this.tableData.forEach((element)=>{
+        //   this.totalCount+=element.count;
+        //   this.totalMoney=this.totalMoney+(element.price*element.count);
+        // });
+    },
+    //删除单个商品
+    delsingleGoods(goods){
+      this.tableData=this.tableData.filter(o=>o.goodsId != goods.goodsId);
+      this.getAllGoods();
+    },
+    //删除全部商品
+    delallGoods(){
+      this.tableData = [];
+      this.totalMoney = 0;
+      this.totalCount = 0;
+    },
+    //重计算总金额和总数量
+    getAllGoods(){
+      this.totalMoney = 0;
+      this.totalCount = 0;
+      if(this.tableData){
+        this.tableData.forEach((element)=>{
         this.totalCount+=element.count;
         this.totalMoney=this.totalMoney+(element.price*element.count);
-      });
+        });
+      }
+    },
+    //模拟结账功能
+    checkOut(){
+      if(this.totalCount !=0 ){
+        this.tableData = [];
+        this.totalMoney = 0;
+        this.totalCount = 0;
+        this.$message({
+          message: '结账成功！Oh-Yeah！',
+          type:'success'
+        })
+      }else{
+        this.$message.error('未点单任何商品，不能结账！')
+      }
     }
   }
 }
